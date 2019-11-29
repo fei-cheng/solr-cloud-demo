@@ -1,0 +1,46 @@
+version: "2"
+services:
+  zookeeper:
+    image: jplock/zookeeper:3.4.8
+    container_name: zookeeper-only
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+
+  solr-master:
+    image: solr:6.2.1
+    hostname: solr-master
+    container_name: solr-master
+    ports:
+      - "8983:8983"
+    links:
+      - zookeeper
+    command: bash -c "/opt/solr/bin/solr start -f -z zookeeper:2181"
+  solr-2:
+    image: solr:6.2.1
+    hostname: solr-2
+    container_name: solr-2
+    links:
+      - zookeeper
+      - solr-master
+    command: bash -c "/opt/solr/bin/solr start -f -z zookeeper:2181"
+  solr-3:
+    image: solr:6.2.1
+    hostname: solr-3
+    container_name: solr-3
+    links:
+      - zookeeper
+      - solr-master
+      - solr-2
+    command: bash -c "/opt/solr/bin/solr start -f -z zookeeper:2181"
+  solr-4:
+    image: solr:6.2.1
+    hostname: solr-4
+    container_name: solr-4
+    links:
+      - zookeeper
+      - solr-master
+      - solr-2
+      - solr-3
+    command: bash -c "/opt/solr/bin/solr start -f -z zookeeper:2181"
